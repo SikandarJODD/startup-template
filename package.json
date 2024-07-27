@@ -42,6 +42,7 @@
 		"svelte-motion": "^0.12.2",
 		"svelte-sonner": "^0.3.27",
 		"tailwind-merge": "^2.4.0",
-		"tailwind-variants": "^0.2.1"
+		"tailwind-variants": "^0.2.1",
+		"tailwindcss-animate": "^1.0.7"
 	}
 }

@@ -55,7 +55,7 @@ const config: Config = {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: [...fontFamily.sans]
+				sans: ['Inter var', ...fontFamily.sans]
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -121,7 +121,8 @@ const config: Config = {
 				}
 			}
 		}
-	}
+	},
+	plugins:[require('tailwindcss-animate')]
 };
 
 export default config;

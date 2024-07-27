@@ -7,7 +7,7 @@
 	class={cn(
 		// color
 		'[--color:var(--color-one)]',
-		'pointer-events-none relative -z-[2] mx-auto h-[50rem] overflow-hidden',
+		'pointer-events-none relative  mx-auto h-[50rem] overflow-hidden',
 
 		// sphere mask
 		'[mask-image:radial-gradient(ellipse_at_center_center,#000,transparent_50%)]',
