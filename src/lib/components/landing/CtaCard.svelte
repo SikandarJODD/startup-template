@@ -10,7 +10,7 @@
 	let inView = false;
 	// we want to make animation based on when it come in view we want to make like fade animation from opacity - 0 to opacity 1
 	const handleChange = ({ detail }: CustomEvent<ObserverEventDetails>) => {
-		console.log(detail);
+		// console.log(detail);
 		inView = detail.inView;
 	};
 	$: {

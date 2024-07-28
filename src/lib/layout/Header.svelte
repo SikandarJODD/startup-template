@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { cn } from '$lib/utils';
 	import { AlignJustify, XIcon } from 'lucide-svelte';
-	import { AnimatePresence, Motion } from 'svelte-motion';
+	import { fly } from 'svelte/transition';
 
 	const menuItem = [
 		{
@@ -26,165 +26,89 @@
 			href: '#'
 		}
 	];
-	const mobilenavbarVariant = {
-		initial: {
-			opacity: 0,
-			scale: 1
-		},
-		animate: {
-			scale: 1,
-			opacity: 1,
-			transition: {
-				duration: 0.2,
-				ease: 'easeOut'
-			}
-		},
-		exit: {
-			opacity: 0,
-			transition: {
-				duration: 0.2,
-				delay: 0.2,
-				ease: 'easeOut'
-			}
-		}
-	};
 
-	const mobileLinkVar = {
-		initial: {
-			y: '-20px',
-			opacity: 0
-		},
-		open: {
-			y: 0,
-			opacity: 1,
-			transition: {
-				duration: 0.3,
-				ease: 'easeOut'
-			}
-		}
-	};
+	let hamburgerMenuIsOpen = false;
 
-	const containerVariants = {
-		open: {
-			transition: {
-				staggerChildren: 0.06
+	function toggleOverflowHidden(node: HTMLElement) {
+		node.addEventListener('click', () => {
+			hamburgerMenuIsOpen = !hamburgerMenuIsOpen;
+			const html = document.querySelector('html');
+			if (html) {
+				if (hamburgerMenuIsOpen) {
+					html.classList.add('overflow-hidden');
+				} else {
+					html.classList.remove('overflow-hidden');
+				}
 			}
-		}
-	};
-	import { onMount, onDestroy } from 'svelte';
-	import { writable } from 'svelte/store';
-
-	let hamburgerMenuIsOpen = writable(false);
-
-	function toggleOverflowHidden(isOpen) {
-		const html = document.querySelector('html');
-		if (html) {
-			if (isOpen) {
-				html.classList.add('overflow-hidden');
-			} else {
-				html.classList.remove('overflow-hidden');
-			}
-		}
+		});
 	}
-
-	$: $hamburgerMenuIsOpen;
-	onMount(() => {
-		toggleOverflowHidden($hamburgerMenuIsOpen);
-		return () => {
-			toggleOverflowHidden(false);
-		};
-	});
-
-	function closeHamburgerNavigation() {
-		hamburgerMenuIsOpen.set(false);
-	}
-
-	onMount(() => {
-		window.addEventListener('orientationchange', closeHamburgerNavigation);
-		window.addEventListener('resize', closeHamburgerNavigation);
-
-		return () => {
-			window.removeEventListener('orientationchange', closeHamburgerNavigation);
-			window.removeEventListener('resize', closeHamburgerNavigation);
-		};
-	});
+	let innerWidth = 0;
 </script>
 
+<svelte:window bind:innerWidth />
 <header
-	class="fixed left-0 top-0 z-50 w-full -translate-y-4 animate-fade-in border-b opacity-0 backdrop-blur-md [--animation-delay:600ms]"
+	class="fixed left-0 top-0 z-50 w-full -translate-y-4 animate-fade-in border-b opacity-0 backdrop-blur-md"
 >
-	<div class="container flex h-14 items-center justify-between">
-		<a class="text-md flex items-center" href="/"> Nyxb UI </a>
+	<!-- {#if innerWidth < 768} -->
+		<div class="container flex h-14 items-center justify-between">
+			<a class="text-md flex items-center" href="/"> Svee UI </a>
 
-		<div class="ml-auto flex h-full items-center">
-			<a class="mr-6 text-sm" href="/signin"> Log in </a>
-			<Button variant="secondary" class="mr-6 text-sm" href="/signup">Sign up</Button>
-		</div>
-		<button class="ml-6 md:hidden" on:click={() => ($hamburgerMenuIsOpen = !$hamburgerMenuIsOpen)}>
-			<span class="sr-only">Toggle menu</span>
-			{#if $hamburgerMenuIsOpen}
-				<XIcon />
-			{:else}
-				<AlignJustify />
-			{/if}
-		</button>
-	</div>
-</header>
-<AnimatePresence let:item list={[{ key: 'a' }]}>
-	<Motion
-		initial="initial"
-		exit="exit"
-		variants={mobilenavbarVariant}
-		animate={$hamburgerMenuIsOpen ? 'animate' : 'exit'}
-		let:motion
-	>
-		<nav
-			use:motion
-			class={cn(
-				`fixed left-0 top-0 z-50 h-screen w-full overflow-auto bg-background/70 backdrop-blur-md `,
-				{
-					'pointer-events-none': !$hamburgerMenuIsOpen
-				}
-			)}
-		>
-			<div class="container flex h-14 items-center justify-between">
-				<a class="text-md flex items-center" href="/"> Nyxb UI </a>
-
-				<button class="md:hidden" on:click={() => ($hamburgerMenuIsOpen = !$hamburgerMenuIsOpen)}>
-					<span class="sr-only">Toggle menu</span>
-					{#if $hamburgerMenuIsOpen}
-						<XIcon strokeWidth={1.6} />
-					{:else}
-						<AlignJustify strokeWidth={1.6} />
-					{/if}
-				</button>
+			<div class="ml-auto flex h-full items-center">
+				<a class="mr-6 text-sm" href="/signin"> Log in </a>
+				<Button variant="secondary" class="mr-6 text-sm" href="/signup">Sign up</Button>
 			</div>
-			<Motion
-				variants={containerVariants}
-				initial="initial"
-				animate={$hamburgerMenuIsOpen ? 'open' : 'exit'}
-				let:motion
-			>
-				<ul
-					use:motion
-					class="flex flex-col uppercase ease-in md:flex-row md:items-center md:normal-case"
-				>
-					{#each menuItem as item}
-						<Motion variants={mobileLinkVar} let:motion>
-							<li use:motion class="border-grey-dark border-b py-0.5 pl-6 md:border-none">
-								<a
-									class="hover:text-grey flex h-[var(--navigation-height)] w-full items-center text-xl transition-[color,transform] duration-300 md:translate-y-0 md:text-sm md:transition-colors {$hamburgerMenuIsOpen
-										? '[&_a]:translate-y-0'
-										: ''}"
-									href={item.href}
-								>
-									{item.label}
-								</a>
-							</li>
-						</Motion>
-					{/each}
-				</ul>
-			</Motion>
-		</nav>
-	</Motion>
-</AnimatePresence>
+			<button class="ml-6 md:hidden" use:toggleOverflowHidden>
+				<span class="sr-only">Toggle menu</span>
+				{#if hamburgerMenuIsOpen}
+					<XIcon  strokeWidth={1.4} class='text-gray-300'/>
+				{:else}
+					<AlignJustify strokeWidth={1.4} class='text-gray-300' />
+				{/if}
+			</button>
+		</div>
+	<!-- {/if} -->
+</header>
+
+<nav
+	class={cn(
+		`fixed left-0 top-0 z-50 h-screen w-full overflow-auto `,
+		{
+			'pointer-events-none': !hamburgerMenuIsOpen
+		},
+		{
+			'bg-background/70 backdrop-blur-md': hamburgerMenuIsOpen
+		}
+	)}
+>
+	{#if hamburgerMenuIsOpen === true}
+		<div class="container flex h-14 items-center justify-between">
+			<a class="text-md flex items-center" href="/"> Svee UI </a>
+
+			<button class="md:hidden" use:toggleOverflowHidden>
+				<span class="sr-only">Toggle menu</span>
+				{#if hamburgerMenuIsOpen}
+					<XIcon strokeWidth={1.4} class='text-gray-300'/>
+				{:else}
+					<AlignJustify strokeWidth={1.4} class='text-gray-300'/>
+				{/if}
+			</button>
+		</div>
+		<ul
+			in:fly={{ y: -30, duration: 400 }}
+			class="flex flex-col uppercase ease-in md:flex-row md:items-center md:normal-case"
+		>
+			{#each menuItem as item, i}
+				<li class="border-grey-dark border-b py-0.5 pl-6 md:border-none">
+					<a
+						class="hover:text-grey flex h-[var(--navigation-height)] w-full items-center text-xl transition-[color,transform] duration-300 md:translate-y-0 md:text-sm md:transition-colors {hamburgerMenuIsOpen
+							? '[&_a]:translate-y-0'
+							: ''}"
+						href={item.href}
+					>
+						{item.label}
+					</a>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+</nav>
